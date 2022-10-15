@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -116,7 +115,6 @@ public class UpdateWidgetService extends Service {
         if (gc.getTime().getTime()>calendar.getTime().getTime()) {
             gc.add(Calendar.MONTH, -1);
         }
-        Log.d("SSW", "START:"+gc.getTime().toString());
         return gc.getTime();
     }
 
