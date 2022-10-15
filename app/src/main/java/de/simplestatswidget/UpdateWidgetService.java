@@ -32,7 +32,8 @@ public class UpdateWidgetService extends Service {
         String callText;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if ((checkSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) &&
-                    (checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED)) {
+                    (checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) &&
+                    (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)) {
                 smsText = String.valueOf(getSmsCount());
                 callText = getCalls();
             } else {
