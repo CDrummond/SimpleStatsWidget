@@ -23,7 +23,7 @@
             android:background="@drawable/curved_layout"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/sms"
-            android:textSize="12sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/loading_text"
-            android:textSize="12sp" />
+            android:textSize="16sp" />
 
     </LinearLayout>
 
@@ -52,7 +52,7 @@
             android:background="@drawable/curved_layout"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/calls"
-            android:textSize="12sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/loading_text"
-            android:textSize="12sp" />
+            android:textSize="16sp" />
 
     </LinearLayout>
 
