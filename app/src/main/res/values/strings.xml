@@ -4,15 +4,17 @@
     <string name="app_name">SimpleStatsWidget</string>
     <string name="savebutton_text">Add Widget</string>
     <string name="loading_text">loading…</string>
-    <string name="settings_minutes_title">round up minutes</string>
+    <string name="settings_minutes_title">Round up minutes</string>
     <string name="settings_minutes_summary">Should a call be rounded up to full minutes?</string>
     <string name="settings_sms_title">SMS length</string>
     <string name="settings_sms_summary">How many characters belong to a single sms?</string>
-    <string name="sms">SMS:</string>
-    <string name="calls">Calls:</string>
-    <string name="settings_smsMax_title">maximum SMS</string>
+    <string name="sms">SMS</string>
+    <string name="calls">Calls</string>
+    <string name="settings_smsMax_title">Maximum SMS</string>
     <string name="settings_smsMax_summary">How many SMS are allowed per month?</string>
-    <string name="settings_callMax_title">minutes included</string>
-    <string name="settings_callMax_summary">How many calls are allowed per month? (in minutes)</string>
+    <string name="settings_callMax_title">Minutes included</string>
+    <string name="settings_callMax_summary">How many calls are allowed per month? (In minutes)</string>
     <string name="settings_countReverse">Show remaining minutes/SMS</string>
+    <string name="settings_start_of_billing_period_summary">On which day of the month does the billing period start?</string>
+    <string name="settings_start_of_billing_period_title">Start of billing period</string>
 </resources>

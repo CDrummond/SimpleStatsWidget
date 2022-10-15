@@ -38,4 +38,10 @@
         android:summary="@string/settings_sms_summary"
         android:title="@string/settings_sms_title" />
 
+    <EditTextPreference
+        android:defaultValue="1"
+        android:inputType="number"
+        android:key="startOfBillingPeriod"
+        android:summary="@string/settings_start_of_billing_period_summary"
+        android:title="@string/settings_start_of_billing_period_title" />
 </PreferenceScreen>

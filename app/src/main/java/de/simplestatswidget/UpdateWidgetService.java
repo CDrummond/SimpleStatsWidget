@@ -11,10 +11,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
+import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -30,19 +30,14 @@ public class UpdateWidgetService extends Service {
         // check permissions and get data
         String smsText;
         String callText;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if ((checkSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) &&
-                    (checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) &&
-                    (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)) {
-                smsText = String.valueOf(getSmsCount());
-                callText = getCalls();
-            } else {
-                smsText = null;
-                callText = null;
-            }
-        } else {
+        if ((checkSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) &&
+                (checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) &&
+                (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)) {
             smsText = String.valueOf(getSmsCount());
             callText = getCalls();
+        } else {
+            smsText = null;
+            callText = null;
         }
 
         // update widgets with new data
@@ -113,29 +108,35 @@ public class UpdateWidgetService extends Service {
         }
     }
 
+    private Date getStartDate(SharedPreferences prefs) {
+        int billingStart = Integer.parseInt(prefs.getString("startOfBillingPeriod", "1"));
+        Calendar calendar = Calendar.getInstance();
+        Calendar gc = new GregorianCalendar(calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH), billingStart);
+        if (gc.getTime().getTime()>calendar.getTime().getTime()) {
+            gc.add(Calendar.MONTH, -1);
+        }
+        Log.d("SSW", "START:"+gc.getTime().toString());
+        return gc.getTime();
+    }
+
     private int getSmsCount() {
         // get settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String smsCharCountString = prefs.getString("smsCharCount", "160");
-        int smsCharCount = Integer.parseInt(smsCharCountString);
-
-        // set a date for this month
-        Calendar calendar = new GregorianCalendar();
-        Date this_month = new GregorianCalendar(calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH), 1).getTime();
+        int smsCharCount = Integer.parseInt(prefs.getString("smsCharCount", "160"));
+        Date startDate = getStartDate(prefs);
 
         // get count of sent sms for this month
         Uri sentMessage = Uri.parse("content://sms/sent/");
         ContentResolver cr = this.getContentResolver();
-        int smscount = 0;
+        int smsCount = 0;
         Cursor c = cr.query(sentMessage, null, null, null, null);
         if (c != null) {
             while (c.moveToNext()) {
-                String date_string = c.getString(c.getColumnIndexOrThrow("date"));
-                Date date = new Date(Long.valueOf(date_string));
-                if (date.after(this_month)) {
+                Date date = new Date(Long.valueOf(c.getString(c.getColumnIndexOrThrow("date"))));
+                if (date.after(startDate)) {
                     String message = c.getString(c.getColumnIndexOrThrow("body"));
-                    smscount += (int) Math.round((double) message.length() / smsCharCount + 0.5);
+                    smsCount += (int) Math.round((double) message.length() / smsCharCount + 0.5);
                 }
             }
             c.close();
@@ -144,40 +145,34 @@ public class UpdateWidgetService extends Service {
         // count sms reverse if checked in preferences
         boolean countReverse = prefs.getBoolean("countReverse", false);
         if (countReverse) {
-            String smsMaxString = prefs.getString("smsMax", "0");
-            int smsMax = Integer.parseInt(smsMaxString);
-            smscount = smsMax - smscount;
+            int smsMax = Integer.parseInt(prefs.getString("smsMax", "0"));
+            smsCount = smsMax - smsCount;
         }
 
-        return smscount;
+        return smsCount;
     }
 
     private String getCalls() {
         // get settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean round = prefs.getBoolean("round", false);
-
-        // set a date for this month
-        Calendar calendar = new GregorianCalendar();
-        Date this_month = new GregorianCalendar(calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH), 1).getTime();
+        Date startDate = getStartDate(prefs);
 
         // get duration of outgoing calls for this month
         Uri allCalls = Uri.parse("content://call_log/calls");
         ContentResolver cr = this.getContentResolver();
-        int callduration = 0;
+        int callDuration = 0;
         Cursor c = cr.query(allCalls, null, "type = " + CallLog.Calls.OUTGOING_TYPE, null, null);
         if (c != null) {
             while (c.moveToNext()) {
-                String date_string = c.getString(c.getColumnIndexOrThrow("date"));
-                Date date = new Date(Long.valueOf(date_string));
-                if (date.after(this_month)) {
+                Date date = new Date(Long.valueOf(c.getString(c.getColumnIndexOrThrow("date"))));
+                if (date.after(startDate)) {
                     int duration = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("duration")));
                     if (duration > 0) {
                         if (round) {
-                            callduration += (int) Math.round((double) duration / 60 + 0.5) * 60;
+                            callDuration += (int) Math.round((double) duration / 60 + 0.5) * 60;
                         } else {
-                            callduration += duration;
+                            callDuration += duration;
                         }
                     }
                 }
@@ -189,18 +184,17 @@ public class UpdateWidgetService extends Service {
         boolean countReverse = prefs.getBoolean("countReverse", false);
         boolean negative = false;
         if (countReverse) {
-            String callMaxString = prefs.getString("callMax", "0");
-            int callMax = Integer.parseInt(callMaxString);
-            callduration = callMax * 60 - callduration;
-            if (callduration < 0) {
+            int callMax = Integer.parseInt(prefs.getString("callMax", "0"));
+            callDuration = callMax * 60 - callDuration;
+            if (callDuration < 0) {
                 negative = true;
-                callduration = callduration * -1;
+                callDuration = callDuration * -1;
             }
         }
 
         // Set the text
-        int minutes = callduration / 60;
-        int seconds = callduration % 60;
+        int minutes = callDuration / 60;
+        int seconds = callDuration % 60;
         String minutesString = String.valueOf(minutes);
         String secondsString = String.valueOf(seconds);
         if (minutes < 10) {
