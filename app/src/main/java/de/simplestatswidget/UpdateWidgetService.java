@@ -194,9 +194,6 @@ public class UpdateWidgetService extends Service {
         // Set the text
         int minutes = callDuration / 60;
         String minutesString = String.valueOf(minutes);
-        if (minutes < 10) {
-            minutesString = "0" + minutesString;
-        }
         if (negative) {
             minutesString = "- " + minutesString;
         }
