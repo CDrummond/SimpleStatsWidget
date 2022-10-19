@@ -168,7 +168,8 @@ public class UpdateWidgetService extends Service {
                     int duration = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("duration")));
                     if (duration > 0) {
                         if (round) {
-                            callDuration += (int) Math.round((double) duration / 60 + 0.5) * 60;
+                            int minutes = duration/60;
+                            callDuration += (minutes * 60) + (duration%60>0 ? 60 : 0);
                         } else {
                             callDuration += duration;
                         }
