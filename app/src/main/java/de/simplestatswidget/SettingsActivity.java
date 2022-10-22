@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.RemoteViews;
 
 public class SettingsActivity extends Activity {
-
+    public static final String UPDATE = "Update";
     private int mAppWidgetId; // widget id
 
     @Override
@@ -54,8 +54,10 @@ public class SettingsActivity extends Activity {
                     AppWidgetManager.INVALID_APPWIDGET_ID);
         }
 
+        boolean isUpdate = intent.getBooleanExtra(UPDATE, false);
         // create widget on save button click
         Button button = (Button) findViewById(R.id.savebutton);
+        button.setText(isUpdate ? R.string.updatebutton_text : R.string.savebutton_text);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 final Context context = SettingsActivity.this;
