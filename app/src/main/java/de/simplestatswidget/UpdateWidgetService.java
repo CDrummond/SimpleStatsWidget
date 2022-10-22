@@ -25,7 +25,6 @@ public class UpdateWidgetService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         // check permissions and get data
         String smsText;
         String callText;
@@ -42,7 +41,6 @@ public class UpdateWidgetService extends Service {
         // update widgets with new data
         updateWidgets(intent, smsText, callText);
         stopSelf();
-
         super.onStartCommand(intent, flags, startId);
         return START_NOT_STICKY;
     }
@@ -58,7 +56,9 @@ public class UpdateWidgetService extends Service {
                 .getApplicationContext());
         int[] allWidgetIds = intent
                 .getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-
+        if (null==allWidgetIds || allWidgetIds.length<1) {
+            return;
+        }
         // update all widgets
         for (int widgetId : allWidgetIds) {
             RemoteViews remoteViews = new RemoteViews(this

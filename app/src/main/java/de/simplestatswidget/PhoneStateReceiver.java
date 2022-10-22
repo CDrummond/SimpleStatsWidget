@@ -14,12 +14,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             return;
         }
         String state = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
+
         if (TelephonyManager.EXTRA_STATE_IDLE.equals(state)) {
             ComponentName thisWidget = new ComponentName(context, SimpleStatsWidgetProvider.class);
             int[] allWidgetIds = AppWidgetManager.getInstance(context).getAppWidgetIds(thisWidget);
-            Intent serviceIntent = new Intent(context.getApplicationContext(), UpdateWidgetService.class);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-            context.startService(serviceIntent);
+            if (null!=allWidgetIds && allWidgetIds.length>0) {
+                Intent serviceIntent = new Intent(context.getApplicationContext(), UpdateWidgetService.class);
+                serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+                context.startService(serviceIntent);
+            }
         }
     }
 }
