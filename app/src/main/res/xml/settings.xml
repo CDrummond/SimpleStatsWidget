@@ -18,6 +18,18 @@
         android:title="@string/settings_callMax_title" />
 
     <EditTextPreference
+        android:enabled="true"
+        android:key="callIgnore"
+        android:summary="@string/settings_callIgnore_summary"
+        android:title="@string/settings_callIgnore_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="round"
+        android:summary="@string/settings_minutes_summary"
+        android:title="@string/settings_minutes_title" />
+
+    <EditTextPreference
         android:defaultValue="100"
         android:enabled="false"
         android:inputType="number"
@@ -25,11 +37,11 @@
         android:summary="@string/settings_smsMax_summary"
         android:title="@string/settings_smsMax_title" />
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="round"
-        android:summary="@string/settings_minutes_summary"
-        android:title="@string/settings_minutes_title" />
+    <EditTextPreference
+        android:enabled="true"
+        android:key="smsIgnore"
+        android:summary="@string/settings_smsIgnore_summary"
+        android:title="@string/settings_smsIgnore_title" />
 
     <EditTextPreference
         android:defaultValue="160"

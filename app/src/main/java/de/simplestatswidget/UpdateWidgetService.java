@@ -20,6 +20,8 @@ import android.widget.RemoteViews;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UpdateWidgetService extends Service {
 
@@ -54,8 +56,7 @@ public class UpdateWidgetService extends Service {
         // get ids
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this
                 .getApplicationContext());
-        int[] allWidgetIds = intent
-                .getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+        int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
         if (null==allWidgetIds || allWidgetIds.length<1) {
             return;
         }
@@ -118,12 +119,26 @@ public class UpdateWidgetService extends Service {
         return gc.getTime();
     }
 
+    private Set<String> getIgnore(SharedPreferences prefs, String key) {
+        String val = prefs.getString(key, null);
+        Set<String> ignore = new HashSet<String>();
+        if (null!=val) {
+            String[] vals = val.split(",");
+            if (null!=vals) {
+                for (String v: vals) {
+                    ignore.add(v.trim());
+                }
+            }
+        }
+        return ignore;
+    }
+
     private int getSmsCount() {
         // get settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int smsCharCount = Integer.parseInt(prefs.getString("smsCharCount", "160"));
         Date startDate = getStartDate(prefs);
-
+        Set<String> ignore = getIgnore(prefs, "smsIgnore");
         // get count of sent sms for this month
         Uri sentMessage = Uri.parse("content://sms/sent/");
         ContentResolver cr = this.getContentResolver();
@@ -131,6 +146,10 @@ public class UpdateWidgetService extends Service {
         Cursor c = cr.query(sentMessage, null, null, null, null);
         if (c != null) {
             while (c.moveToNext()) {
+                String number = c.getString(c.getColumnIndexOrThrow("address"));
+                if (ignore.contains(number)) {
+                    continue;
+                }
                 Date date = new Date(Long.valueOf(c.getString(c.getColumnIndexOrThrow("date"))));
                 if (date.after(startDate)) {
                     String message = c.getString(c.getColumnIndexOrThrow("body"));
@@ -155,6 +174,7 @@ public class UpdateWidgetService extends Service {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean round = prefs.getBoolean("round", false);
         Date startDate = getStartDate(prefs);
+        Set<String> ignore = getIgnore(prefs, "callIgnore");
 
         // get duration of outgoing calls for this month
         Uri allCalls = Uri.parse("content://call_log/calls");
@@ -163,9 +183,13 @@ public class UpdateWidgetService extends Service {
         Cursor c = cr.query(allCalls, null, "type = " + CallLog.Calls.OUTGOING_TYPE, null, null);
         if (c != null) {
             while (c.moveToNext()) {
-                Date date = new Date(Long.valueOf(c.getString(c.getColumnIndexOrThrow("date"))));
+                String number = c.getString(c.getColumnIndexOrThrow(CallLog.Calls.NUMBER));
+                if (ignore.contains(number)) {
+                    continue;
+                }
+                Date date = new Date(Long.valueOf(c.getString(c.getColumnIndexOrThrow(CallLog.Calls.DATE))));
                 if (date.after(startDate)) {
-                    int duration = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("duration")));
+                    int duration = Integer.parseInt(c.getString(c.getColumnIndexOrThrow(CallLog.Calls.DURATION)));
                     if (duration > 0) {
                         if (round) {
                             int minutes = duration/60;

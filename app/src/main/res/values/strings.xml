@@ -17,4 +17,8 @@
     <string name="settings_countReverse">Show remaining minutes/SMS</string>
     <string name="settings_start_of_billing_period_summary">On which day of the month does the billing period start?</string>
     <string name="settings_start_of_billing_period_title">Start of billing period</string>
+    <string name="settings_callIgnore_title">Ignore calls to</string>
+    <string name="settings_callIgnore_summary">Comma separated list of numbers to ignore</string>
+    <string name="settings_smsIgnore_title">Ignore SMS to</string>
+    <string name="settings_smsIgnore_summary">Comma separated list of numbers to ignore</string>
 </resources>
